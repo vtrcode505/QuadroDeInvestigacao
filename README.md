@@ -30,8 +30,6 @@ Acesse `http://localhost:3000`
 | `Ctrl+-` | Zoom - |
 | `Ctrl+0` | Resetar zoom |
 
-## Funcionalidades
-
 ## Modo Jogador
 - Ver e mover pistas no quadro
 - Conectar pistas com fios coloridos
