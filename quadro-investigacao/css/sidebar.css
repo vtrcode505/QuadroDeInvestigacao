@@ -1,0 +1,94 @@
+/* ================================================================
+   sidebar.css — Tool sidebar
+   ================================================================ */
+
+#sidebar {
+  width: var(--sidebar-w); flex-shrink: 0; background: var(--ui-panel);
+  border-right: 1px solid var(--ui-border); display: flex; flex-direction: column;
+  z-index: 50; overflow: hidden; position: relative;
+}
+#sidebar::after {
+  content: ''; position: absolute; top: 0; right: 0; width: 1px; height: 100%;
+  background: linear-gradient(to bottom, transparent, rgba(180,130,60,0.4) 20%, rgba(180,130,60,0.4) 80%, transparent);
+}
+
+.tool-group { padding: 12px 8px 8px; border-bottom: 1px solid var(--ui-border); }
+.tool-group-label {
+  font-size: 0.46rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--ui-text-muted); text-align: center; margin-bottom: 8px;
+}
+
+/* ── Tool buttons ── */
+.tool-btn {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  width: 100%; padding: 8px 4px; gap: 4px; border-radius: 4px; color: var(--ui-text-dim);
+  font-size: 0.6rem; letter-spacing: 0.06em; transition: all var(--t-fast);
+  margin-bottom: 2px; position: relative;
+}
+.tool-btn:hover { background: rgba(255,255,255,0.04); color: var(--ui-text); }
+.tool-btn.active { background: rgba(160,112,48,0.16); color: var(--ui-accent-h, #c49040); }
+.tool-btn.active::before {
+  content: ''; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 2px; height: 68%; background: var(--ui-accent); border-radius: 0 2px 2px 0;
+}
+.tool-btn.tool-add {
+  background: rgba(80,60,20,0.28); border: 1px solid rgba(160,112,48,0.28); color: var(--ui-master);
+}
+.tool-btn.tool-add:hover {
+  background: rgba(100,75,24,0.42); border-color: rgba(160,112,48,0.5); color: var(--ui-master-h);
+  box-shadow: 0 0 14px rgba(139,105,20,0.32);
+}
+.ticon { font-size: 1.2rem; line-height: 1; }
+.tlabel { font-size: 0.52rem; letter-spacing: 0.08em; text-transform: uppercase; }
+
+/* ── Color swatches ── */
+#color-swatches { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; padding: 2px 0; }
+.swatch {
+  width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent;
+  cursor: pointer; transition: all var(--t-fast); box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.swatch:hover { transform: scale(1.18); }
+.swatch.active { border-color: rgba(255,255,255,0.7); box-shadow: 0 0 9px currentColor, 0 1px 4px rgba(0,0,0,0.5); }
+
+/* ── Sidebar footer ── */
+#sidebar-footer { margin-top: auto; padding: 10px 8px; border-top: 1px solid var(--ui-border); }
+#tool-hint { font-size: 0.54rem; color: var(--ui-text-muted); text-align: center; line-height: 1.45; margin-bottom: 8px; min-height: 2em; }
+
+/* ── Zoom ── */
+#zoom-display { display: flex; align-items: center; justify-content: center; gap: 4px; }
+.zoom-btn {
+  width: 22px; height: 22px; border: 1px solid var(--ui-border); border-radius: 3px;
+  font-size: 0.9rem; color: var(--ui-text-dim); display: flex; align-items: center;
+  justify-content: center; transition: all var(--t-fast);
+}
+.zoom-btn:hover { border-color: var(--ui-accent); color: var(--ui-text); }
+#zoom-pct { font-size: 0.58rem; color: var(--ui-text-dim); min-width: 34px; text-align: center; letter-spacing: 0.04em; }
+
+/* ── Draw subtools ── */
+.draw-mode-row { display: flex; flex-direction: column; gap: 3px; }
+.draw-mode-btn {
+  width: 100%; padding: 5px 8px; border: 1px solid var(--ui-border); border-radius: 3px;
+  font-size: 0.66rem; color: var(--ui-text-dim); background: rgba(255,255,255,0.03);
+  text-align: left; transition: all var(--t-fast); cursor: pointer;
+}
+.draw-mode-btn:hover { background: rgba(255,255,255,0.06); color: var(--ui-text); }
+.draw-mode-btn.active {
+  background: rgba(160,112,48,0.18); border-color: rgba(160,112,48,0.45); color: var(--ui-accent-h, #c49040);
+}
+
+#draw-color-swatches { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; padding: 2px 0; }
+.draw-color-btn {
+  width: 22px; height: 22px; border-radius: 50%; border: 2px solid transparent;
+  cursor: pointer; transition: all var(--t-fast); box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.draw-color-btn:hover { transform: scale(1.18); }
+.draw-color-btn.active { border-color: rgba(255,255,255,0.75); box-shadow: 0 0 9px currentColor, 0 1px 4px rgba(0,0,0,0.5); }
+
+#draw-width-btns { display: flex; gap: 4px; justify-content: center; padding: 2px 0; }
+.draw-width-btn {
+  flex: 1; padding: 4px 2px; border: 1px solid var(--ui-border); border-radius: 3px;
+  font-size: 0.9rem; color: var(--ui-text-dim); background: rgba(255,255,255,0.03);
+  text-align: center; transition: all var(--t-fast); cursor: pointer;
+}
+.draw-width-btn:hover { border-color: var(--ui-accent); color: var(--ui-text); }
+.draw-width-btn.active { background: rgba(160,112,48,0.18); border-color: rgba(160,112,48,0.45); color: var(--ui-accent-h, #c49040); }

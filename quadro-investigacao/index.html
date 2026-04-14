@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quadro de Investigação</title>
+  <meta name="description" content="Sistema imersivo de quadro investigativo para RPG de mesa — conecte pistas, trace teorias e resolva o mistério." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Caveat:wght@400;600&family=IM+Fell+English+SC&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.27/dist/interact.min.js"></script>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/board.css" />
+  <link rel="stylesheet" href="css/cards.css" />
+  <link rel="stylesheet" href="css/sidebar.css" />
+  <link rel="stylesheet" href="css/modals.css" />
+</head>
+<body>
+  <div id="grain-overlay" aria-hidden="true"></div>
+
+  <header id="app-header">
+    <div id="header-left">
+      <div id="logo">
+        <span class="logo-icon">🔍</span>
+        <div class="logo-text">
+          <span class="logo-title">Quadro de Investigação</span>
+          <span class="logo-sub">Sistema de Análise Criminal</span>
+        </div>
+      </div>
+    </div>
+    <div id="header-center">
+      <div id="mode-toggle" role="group" aria-label="Modo de usuário">
+        <button id="btn-player-mode" class="mode-btn active" aria-pressed="true"><span>👁</span> Jogador</button>
+        <button id="btn-master-mode" class="mode-btn" aria-pressed="false"><span>🎭</span> Mestre</button>
+      </div>
+    </div>
+    <div id="header-right">
+      <button id="btn-export" class="hdr-btn" title="Exportar (Ctrl+E)">📤 Exportar</button>
+      <input type="file" id="import-file-input" accept=".json" style="display:none" />
+      <button id="btn-import" class="hdr-btn" title="Importar (Ctrl+I)">📥 Importar</button>
+      <button id="btn-clear" class="hdr-btn hdr-btn-danger" title="Limpar quadro">🗑 Limpar</button>
+    </div>
+  </header>
+
+  <div id="app-layout">
+    <aside id="sidebar">
+      <!-- ── Ferramentas principais ── -->
+      <div class="tool-group">
+        <div class="tool-group-label">Ferramentas</div>
+        <button class="tool-btn active" id="tool-move"     data-tool="move"     title="Mover (V)">   <span class="ticon">✋</span><span class="tlabel">Mover</span></button>
+        <button class="tool-btn"        id="tool-pin"      data-tool="pin"      title="Fixar (P)">   <span class="ticon">📌</span><span class="tlabel">Fixar</span></button>
+        <button class="tool-btn"        id="tool-connect"  data-tool="connect"  title="Conectar (C)"><span class="ticon">🧵</span><span class="tlabel">Conectar</span></button>
+        <button class="tool-btn"        id="tool-annotate" data-tool="annotate" title="Anotar (A)">  <span class="ticon">✏️</span><span class="tlabel">Anotar</span></button>
+        <button class="tool-btn"        id="tool-delete"   data-tool="delete"   title="Remover (Del)"><span class="ticon">✂️</span><span class="tlabel">Remover</span></button>
+        <button class="tool-btn"        id="tool-draw"     data-tool="draw"     title="Rabiscar (D)"><span class="ticon">🖌️</span><span class="tlabel">Rabisco</span></button>
+      </div>
+
+      <!-- ── Cor do fio (connect mode) ── -->
+      <div class="tool-group" id="color-tool-group" style="display:none">
+        <div class="tool-group-label">Cor do Fio</div>
+        <div id="color-swatches">
+          <button class="swatch active" data-color="#cc1111" style="background:#cc1111" title="Vermelho"></button>
+          <button class="swatch" data-color="#e8a020" style="background:#e8a020" title="Âmbar"></button>
+          <button class="swatch" data-color="#2255cc" style="background:#2255cc" title="Azul"></button>
+          <button class="swatch" data-color="#22aa44" style="background:#22aa44" title="Verde"></button>
+          <button class="swatch" data-color="#cccccc" style="background:#cccccc" title="Branco"></button>
+        </div>
+      </div>
+
+      <!-- ── Subtools do Rabisco ── -->
+      <div class="tool-group" id="draw-subtools" style="display:none">
+        <div class="tool-group-label">Modo</div>
+        <div class="draw-mode-row">
+          <button class="draw-mode-btn active" data-draw-mode="pen"    title="Caneta">✒️ Caneta</button>
+          <button class="draw-mode-btn"        data-draw-mode="eraser" title="Borracha">🩹 Apagar</button>
+        </div>
+        <div class="tool-group-label" style="margin-top:8px">Cor</div>
+        <div id="draw-color-swatches">
+          <button class="draw-color-btn active" data-draw-color="#1c1208" style="background:#1c1208;border-color:rgba(255,255,255,0.5)" title="Tinta"></button>
+          <button class="draw-color-btn" data-draw-color="#cc1111" style="background:#cc1111" title="Vermelho"></button>
+          <button class="draw-color-btn" data-draw-color="#1a66cc" style="background:#1a66cc" title="Azul"></button>
+          <button class="draw-color-btn" data-draw-color="#229944" style="background:#229944" title="Verde"></button>
+          <button class="draw-color-btn" data-draw-color="#f5e6c4" style="background:#f5e6c4;border-color:rgba(0,0,0,0.4)" title="Claro"></button>
+        </div>
+        <div class="tool-group-label" style="margin-top:8px">Espessura</div>
+        <div id="draw-width-btns">
+          <button class="draw-width-btn active" data-draw-width="2" title="Fino">—</button>
+          <button class="draw-width-btn"        data-draw-width="5" title="Médio">━</button>
+          <button class="draw-width-btn"        data-draw-width="11" title="Grosso">▬</button>
+        </div>
+      </div>
+
+      <!-- ── Mestre ── -->
+      <div class="tool-group" id="master-tool-group" style="display:none">
+        <div class="tool-group-label">Mestre</div>
+        <button class="tool-btn tool-add" id="tool-add-clue" title="Nova Pista (N)">
+          <span class="ticon">➕</span><span class="tlabel">Nova Pista</span>
+        </button>
+      </div>
+
+      <div id="sidebar-footer">
+        <div id="tool-hint"></div>
+        <div id="zoom-display">
+          <button id="btn-zoom-out"   class="zoom-btn" title="Diminuir zoom">−</button>
+          <span id="zoom-pct">100%</span>
+          <button id="btn-zoom-in"    class="zoom-btn" title="Aumentar zoom">+</button>
+          <button id="btn-zoom-reset" class="zoom-btn" title="Resetar vista">⌂</button>
+        </div>
+      </div>
+    </aside>
+
+    <main id="board-viewport">
+      <div id="board-container">
+        <!-- SVG: drawings + connections (width/height 100% so paths render correctly) -->
+        <svg id="connections-svg" xmlns="http://www.w3.org/2000/svg"
+          style="position:absolute;top:0;left:0;width:100%;height:100%;overflow:visible;pointer-events:none;">
+          <g id="drawings-group"></g>
+          <g id="connections-group"></g>
+          <g id="connection-preview-group" style="display:none">
+            <path id="preview-shadow" stroke="rgba(0,0,0,0.35)" stroke-width="7"  stroke-linecap="round" fill="none"/>
+            <path id="preview-line"   stroke="#cc1111"           stroke-width="3"  stroke-linecap="round" fill="none" stroke-dasharray="10 5"/>
+          </g>
+        </svg>
+        <!-- Cards injected by JS -->
+        <!-- Connection delete buttons injected by JS -->
+      </div>
+
+      <div id="vignette" aria-hidden="true"></div>
+
+      <div id="minimap" aria-label="Mini mapa">
+        <div id="minimap-inner"><div id="minimap-viewport-rect"></div></div>
+        <div class="minimap-label">Visão Geral</div>
+      </div>
+
+      <div id="connect-hud" class="board-hud" style="display:none">
+        🧵 Clique em outra pista para conectar &nbsp;•&nbsp; <kbd>Esc</kbd> cancela
+      </div>
+
+      <div id="empty-hint">
+        <div class="eh-icon">🔍</div>
+        <div class="eh-title">Quadro Vazio</div>
+        <div class="eh-desc">Ative o <strong>Modo Mestre</strong> e clique em <strong>Nova Pista</strong> para começar.</div>
+      </div>
+    </main>
+  </div>
+
+  <div id="modal-overlay" aria-hidden="true"></div>
+
+  <!-- Detail Modal -->
+  <div id="modal-detail" class="modal" role="dialog" aria-modal="true" aria-labelledby="md-title" aria-hidden="true">
+    <button class="modal-close-x" id="md-close" aria-label="Fechar">×</button>
+    <div class="modal-tape" aria-hidden="true"></div>
+    <div class="modal-content">
+      <div class="modal-badge-row">
+        <span class="modal-badge">EVIDÊNCIA</span>
+        <span id="md-id" class="modal-clue-id"></span>
+      </div>
+      <h2 id="md-title" class="modal-title-h"></h2>
+      <div id="md-img-wrap" class="modal-img-wrap" style="display:none"><img id="md-img" src="" alt="Imagem da pista" /></div>
+      <div id="md-desc" class="modal-desc"></div>
+      <div class="modal-divider"></div>
+      <div class="modal-annotation">
+        <label class="annot-label" for="md-annotation">✏️ Anotações dos Detetives</label>
+        <textarea id="md-annotation" class="annot-textarea" placeholder="Registre suas teorias e observações..."></textarea>
+        <div id="annot-saved" class="saved-indicator" aria-live="polite"></div>
+      </div>
+    </div>
+    <div class="modal-footer-btns">
+      <button id="md-edit-btn" class="btn-modal-secondary" style="display:none">✏️ Editar</button>
+      <button id="md-close-btn" class="btn-modal-primary">Fechar</button>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="modal-edit" class="modal modal-edit-style" role="dialog" aria-modal="true" aria-labelledby="me-title-h" aria-hidden="true">
+    <button class="modal-close-x" id="me-close" aria-label="Fechar">×</button>
+    <div class="modal-tape tape-amber" aria-hidden="true"></div>
+    <div class="modal-content">
+      <div class="modal-badge-row"><span class="modal-badge badge-master">MESTRE — EDITOR</span></div>
+      <h2 id="me-title-h" class="modal-title-h">Nova Pista</h2>
+      <div class="form-field">
+        <label class="form-label" for="me-title-input">Título *</label>
+        <input type="text" id="me-title-input" class="form-input" placeholder="Nome da evidência..." autocomplete="off" />
+      </div>
+      <div class="form-field">
+        <label class="form-label">Imagem</label>
+        <div class="img-tabs">
+          <button class="img-tab active" data-img-tab="upload" type="button">📁 Upload</button>
+          <button class="img-tab" data-img-tab="url"    type="button">🔗 URL</button>
+          <button class="img-tab" data-img-tab="none"   type="button">✕ Nenhuma</button>
+        </div>
+        <div id="img-upload-panel" class="img-tab-panel">
+          <div id="img-dropzone" class="img-dropzone" tabindex="0" role="button" aria-label="Área de upload de imagem">
+            <span class="dz-icon">📸</span>
+            <span class="dz-text">Arraste ou clique para adicionar imagem</span>
+            <span class="dz-hint">PNG, JPG, WEBP — máx 5MB</span>
+            <img id="dz-preview" class="dz-preview-img" style="display:none" alt="Preview" />
+          </div>
+          <input type="file" id="img-file-input" accept="image/*" style="display:none" />
+          <button type="button" id="dz-remove-btn" class="btn-text-sm" style="display:none">✕ Remover imagem</button>
+        </div>
+        <div id="img-url-panel" class="img-tab-panel" style="display:none">
+          <input type="url" id="me-img-url" class="form-input" placeholder="https://..." />
+          <div id="url-img-preview" style="display:none;margin-top:8px">
+            <img id="url-preview-img" src="" alt="Preview URL" style="max-height:120px;border-radius:4px;object-fit:cover;width:100%" />
+          </div>
+        </div>
+        <div id="img-none-panel" class="img-tab-panel" style="display:none">
+          <p class="no-image-msg">Esta pista não terá imagem.</p>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="me-desc">Descrição / Conteúdo</label>
+        <textarea id="me-desc" class="form-textarea" placeholder="Descreva a pista em detalhes..." rows="5"></textarea>
+      </div>
+      <input type="hidden" id="me-clue-id" value="" />
+    </div>
+    <div class="modal-footer-btns">
+      <button id="me-cancel-btn" class="btn-modal-secondary">Cancelar</button>
+      <button id="me-save-btn"   class="btn-modal-primary">Adicionar ao Quadro</button>
+    </div>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="modal-confirm" class="modal modal-confirm-style" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-badge-row"><span class="modal-badge badge-danger">⚠️ ATENÇÃO</span></div>
+      <p id="confirm-msg" class="confirm-text"></p>
+    </div>
+    <div class="modal-footer-btns">
+      <button id="confirm-cancel" class="btn-modal-secondary">Cancelar</button>
+      <button id="confirm-ok"     class="btn-modal-danger">Confirmar</button>
+    </div>
+  </div>
+
+  <div id="toast-container" aria-live="assertive"></div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/board.js"></script>
+  <script src="js/connections.js"></script>
+  <script src="js/cards.js"></script>
+  <script src="js/draw.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

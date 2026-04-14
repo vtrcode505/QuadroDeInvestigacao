@@ -1,0 +1,142 @@
+/* ================================================================
+   cards.css — Clue cards: visual imersivo estilo mural policial
+   ================================================================ */
+
+/* ── Card base ── */
+.clue-card {
+  position: absolute;
+  width: var(--card-w);
+  /* Aged paper background */
+  background-color: var(--paper);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23p)' opacity='0.09'/%3E%3C/svg%3E"),
+    radial-gradient(ellipse at center, transparent 55%, rgba(100,65,20,0.18) 100%);
+  background-size: 200px 200px, cover;
+  border-radius: 2px;
+  /* Physical drop shadow */
+  box-shadow:
+    1px 1px 0 rgba(0,0,0,0.12),
+    3px 3px 0 rgba(0,0,0,0.08),
+    0 8px 26px rgba(0,0,0,0.52),
+    0 2px 6px rgba(0,0,0,0.42);
+  transform: rotate(var(--r, 0deg));
+  transform-origin: center 14px; /* pivot near the pin */
+  user-select: none;
+  cursor: grab;
+  z-index: 10;
+  transition: box-shadow var(--t-mid), transform var(--t-mid), outline var(--t-fast);
+  outline: 2px solid transparent;
+  outline-offset: 4px;
+}
+.clue-card:hover {
+  box-shadow:
+    1px 1px 0 rgba(0,0,0,0.12),
+    3px 3px 0 rgba(0,0,0,0.08),
+    0 20px 50px rgba(0,0,0,0.65),
+    0 6px 14px rgba(0,0,0,0.52);
+  transform: rotate(var(--r, 0deg)) translateY(-5px) scale(1.03);
+  z-index: 20;
+}
+.clue-card:active { cursor: grabbing; }
+.clue-card.pinned { cursor: default; }
+
+/* Connect mode highlights */
+.clue-card.connect-target {
+  outline-color: var(--thread-red);
+  box-shadow: 0 0 0 2px var(--thread-red), 0 0 22px rgba(200,20,20,0.42), 0 8px 26px rgba(0,0,0,0.52);
+}
+.clue-card.connect-source {
+  outline-color: #ff8844;
+  box-shadow: 0 0 0 2px #ff8844, 0 0 28px rgba(255,120,50,0.5), 0 8px 26px rgba(0,0,0,0.52);
+}
+body.tool-delete .clue-card:hover {
+  outline-color: var(--ui-danger);
+  box-shadow: 0 0 0 2px var(--ui-danger), 0 0 20px rgba(180,20,20,0.42), 0 8px 26px rgba(0,0,0,0.52);
+}
+
+/* ── Push pin ── */
+.card-pin {
+  position: absolute; top: -16px; left: 50%;
+  transform: translateX(-50%); width: 20px; height: 22px;
+  z-index: 5; pointer-events: none;
+}
+.card-pin::before {
+  content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 16px; height: 16px; border-radius: 50%;
+  background:
+    radial-gradient(circle at 36% 30%, rgba(255,200,200,0.65) 0%, rgba(180,20,20,0) 52%),
+    radial-gradient(circle at center, #e02525, #7a0808);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.65), inset 0 1px 2px rgba(255,180,180,0.35), inset 0 -1px 2px rgba(0,0,0,0.35);
+}
+.card-pin::after {
+  content: ''; position: absolute; top: 13px; left: 50%; transform: translateX(-50%);
+  width: 2px; height: 8px;
+  background: linear-gradient(to bottom, #bbb 0%, #666 50%, #333 100%);
+  border-radius: 0 0 1px 1px;
+}
+/* Pin colour variants */
+.card-pin.pin-amber::before { background: radial-gradient(circle at 38% 32%, rgba(255,230,150,0.65) 0%, transparent 52%), radial-gradient(circle at center, #e8a020, #976010); }
+.card-pin.pin-blue::before  { background: radial-gradient(circle at 38% 32%, rgba(150,200,255,0.65) 0%, transparent 52%), radial-gradient(circle at center, #2266dd, #0f2f99); }
+.card-pin.pin-green::before { background: radial-gradient(circle at 38% 32%, rgba(150,255,180,0.65) 0%, transparent 52%), radial-gradient(circle at center, #22aa44, #116622); }
+
+/* ── Tape strip ── */
+.card-tape {
+  position: absolute; top: -7px; left: 50%;
+  transform: translateX(-50%); width: 72px; height: 23px;
+  background: rgba(235,208,138,0.52);
+  border: 1px solid rgba(200,170,100,0.28);
+  background-image: repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(200,170,100,0.13) 4px, rgba(200,170,100,0.13) 5px);
+  border-radius: 1px; pointer-events: none; z-index: 4;
+}
+
+/* ── Card inner ── */
+.card-inner { padding: 22px 12px 12px; position: relative; }
+.clue-card.has-image .card-inner { padding-top: 10px; }
+
+/* ── Card image ── */
+.card-img-wrap {
+  overflow: hidden;
+  border-bottom: 3px solid rgba(110,72,26,0.3);
+  position: relative; background: #0e0e0e;
+}
+.card-img-wrap img {
+  width: 100%; height: 150px; object-fit: cover; object-position: center;
+  display: block; filter: sepia(0.22) contrast(1.06);
+}
+
+/* ── Title ── */
+.card-title {
+  font-family: var(--f-typewriter); font-size: 0.82rem; color: var(--ink);
+  line-height: 1.35; margin-bottom: 6px; word-wrap: break-word; letter-spacing: 0.02em;
+}
+
+/* ── Description preview ── */
+.card-desc {
+  font-family: var(--f-typewriter); font-size: 0.67rem; color: var(--ink-light);
+  line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical; overflow: hidden; opacity: 0.82;
+}
+
+/* ── Stamp ── */
+.card-stamp {
+  position: absolute; bottom: 8px; right: 8px;
+  font-family: var(--f-title); font-size: 0.47rem; letter-spacing: 0.22em;
+  color: rgba(150,80,28,0.38); text-transform: uppercase; transform: rotate(2deg);
+  pointer-events: none;
+}
+
+/* ── Badges ── */
+.card-annot-badge, .card-pinned-badge {
+  position: absolute; top: 10px; font-size: 0.68rem; opacity: 0.58;
+  pointer-events: none; display: none;
+}
+.card-annot-badge { right: 8px; }
+.card-pinned-badge { left: 8px; }
+.card-annot-badge.visible, .card-pinned-badge.visible { display: block; }
+
+/* ── Card appear animation ── */
+@keyframes card-appear {
+  from { opacity: 0; transform: rotate(var(--r, 0deg)) translateY(-22px) scale(0.88); }
+  to   { opacity: 1; transform: rotate(var(--r, 0deg)) translateY(0) scale(1); }
+}
+.clue-card.just-added { animation: card-appear 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }

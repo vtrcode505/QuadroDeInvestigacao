@@ -1,0 +1,150 @@
+/* ================================================================
+   board.css — Cork board, infinite canvas, lamp, vignette, minimap
+   ================================================================ */
+
+/* ── Board Viewport ── */
+#board-viewport {
+  position: relative; flex: 1; overflow: hidden; cursor: grab;
+
+  /* ── Clean cork texture (SVG turbulence — NO elliptic spots) ── */
+  background-color: #7c5924;
+  background-image:
+    /* Subtle warm central wash (depth/light) */
+    radial-gradient(ellipse 80% 65% at 50% 42%,
+      rgba(195, 148, 72, 0.10) 0%,
+      rgba(140, 98, 40, 0.05) 55%,
+      transparent 75%),
+    /* Cork fibre grain via SVG turbulence — uniform, no blotches */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Cfilter id='c'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.35 0.72' numOctaves='5' seed='8' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0.46 0 0 0 0.30 0 0.42 0 0 0.18 0 0 0.24 0 0.05 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='512' height='512' filter='url(%23c)'/%3E%3C/svg%3E");
+  background-size: auto, 512px 512px;
+}
+#board-viewport:active { cursor: grabbing; }
+
+/* ── Infinite canvas ── */
+#board-container {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  transform-origin: 0 0; will-change: transform; overflow: visible;
+}
+
+/* ── Lamp light (warm overhead, slow-breathing) ── */
+#lamp-light {
+  position: absolute; inset: 0; pointer-events: none; z-index: 7;
+  background:
+    radial-gradient(ellipse 58% 48% at 50% 28%,
+      rgba(255, 240, 175, 0.22) 0%,
+      rgba(255, 215, 125, 0.11) 42%,
+      rgba(240, 185, 80,  0.04) 65%,
+      transparent 80%),
+    radial-gradient(ellipse 30% 24% at 50% 15%,
+      rgba(255, 248, 200, 0.10) 0%,
+      transparent 70%);
+  animation: lamp-breath 7s ease-in-out infinite;
+}
+@keyframes lamp-breath {
+  0%, 100% { opacity: 0.78; }
+  50%       { opacity: 1.00; }
+}
+
+/* ── Vignette (static — deep cinematic border darkness) ── */
+#vignette {
+  position: absolute; inset: 0; pointer-events: none; z-index: 10;
+  background: radial-gradient(
+    ellipse 84% 73% at 50% 50%,
+    transparent 32%,
+    rgba(4, 2, 0, 0.30) 60%,
+    rgba(3, 1, 0, 0.65) 82%,
+    rgba(2, 0, 0, 0.82) 100%
+  );
+}
+
+/* ── HUD ── */
+.board-hud {
+  position: absolute; bottom: 130px; left: 50%; transform: translateX(-50%);
+  z-index: 100; background: rgba(8,5,2,0.92); border: 1px solid var(--thread-red);
+  border-radius: 4px; padding: 10px 22px; font-size: 0.78rem; color: #ffaaaa;
+  letter-spacing: 0.05em; backdrop-filter: blur(8px);
+  box-shadow: 0 0 22px rgba(200,20,20,0.28); animation: hud-pulse 2.5s ease-in-out infinite;
+}
+.board-hud kbd {
+  display: inline-block; padding: 1px 6px; background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2); border-radius: 3px; font-size: 0.7rem; font-family: var(--f-ui);
+}
+@keyframes hud-pulse {
+  0%, 100% { box-shadow: 0 0 22px rgba(200,20,20,0.28); }
+  50%       { box-shadow: 0 0 35px rgba(200,20,20,0.50), 0 0 10px rgba(200,20,20,0.18); }
+}
+
+/* ── Empty board hint ── */
+#empty-hint {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  text-align: center; pointer-events: none; z-index: 5; transition: opacity var(--t-slow);
+}
+#empty-hint.hidden { opacity: 0; }
+.eh-icon  { font-size: 3rem; margin-bottom: 12px; opacity: 0.26; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
+.eh-title { font-family: var(--f-title); font-size: 1.2rem; color: rgba(180,140,80,0.36); margin-bottom: 8px; letter-spacing: 0.1em; }
+.eh-desc  { font-size: 0.74rem; color: rgba(140,100,50,0.36); max-width: 220px; line-height: 1.6; }
+.eh-desc strong { color: rgba(180,140,80,0.46); }
+
+/* ── Minimap ── */
+#minimap {
+  position: absolute; bottom: 16px; right: 16px; z-index: 50;
+  background: rgba(6,4,2,0.90); border: 1px solid var(--ui-border);
+  border-radius: 4px; padding: 6px; backdrop-filter: blur(4px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.55);
+}
+#minimap-inner {
+  width: 160px; height: 100px; position: relative; overflow: hidden;
+  background: rgba(80,55,25,0.30); border: 1px solid rgba(255,255,255,0.05); border-radius: 2px;
+}
+.minimap-card-dot {
+  position: absolute; background: rgba(220,190,120,0.72);
+  border-radius: 1px; transform: translate(-50%,-50%); pointer-events: none;
+}
+#minimap-viewport-rect {
+  position: absolute; border: 1px solid rgba(200,160,80,0.72);
+  background: rgba(200,160,80,0.07); pointer-events: none;
+}
+.minimap-label {
+  text-align: center; font-size: 0.55rem; color: var(--ui-text-muted);
+  letter-spacing: 0.12em; text-transform: uppercase; margin-top: 4px;
+}
+
+/* ── Connection delete button ──
+   ONLY visible when connect tool is active (helps see & remove connections) */
+.conn-delete-btn {
+  position: absolute;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(120,18,18,0.80);
+  border: 1px solid rgba(220,80,80,0.55);
+  color: rgba(255,210,210,0.95);
+  font-size: 13px; font-weight: bold; line-height: 1;
+  cursor: pointer; display: none; /* hidden by default */
+  align-items: center; justify-content: center;
+  transform: translate(-50%, -50%);
+  z-index: 25; transition: all 0.15s ease;
+  font-family: sans-serif; pointer-events: none;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.55);
+}
+/* Show only in connect mode */
+body.tool-connect .conn-delete-btn {
+  display: flex; pointer-events: auto;
+}
+body.tool-connect .conn-delete-btn:hover {
+  background: rgba(195,22,22,0.97); border-color: rgba(255,120,120,0.85);
+  color: white; box-shadow: 0 0 12px rgba(210,30,30,0.62);
+  width: 22px; height: 22px; font-size: 16px;
+}
+
+/* ── Draw tool cursors ── */
+body.tool-draw #board-viewport        { cursor: crosshair; }
+body.tool-draw.draw-eraser #board-viewport { cursor: cell; }
+
+/* ── Rubber-band selection rect ── */
+#selection-rect {
+  position: absolute;
+  border: 1.5px dashed rgba(215, 175, 65, 0.78);
+  background: rgba(215, 175, 65, 0.07);
+  pointer-events: none; z-index: 50;
+  border-radius: 2px;
+}
